@@ -22,8 +22,10 @@ import java.util.List;
 
 /**
  * Created by Administrator on 4/20 0020.
+ * <p/>
+ * 注意这个是测试的类
  */
-public class CakeView extends View {
+public class CakeViewDemo extends View {
 
     private Context ctx;
     private DecimalFormat format;
@@ -39,6 +41,7 @@ public class CakeView extends View {
     private float total;
     private float startAngle;
     private float textAngle;
+
     private float roundAngle;
     private boolean isAddText = false;
 
@@ -47,15 +50,15 @@ public class CakeView extends View {
 
     private MyHandler handler;
 
-    public CakeView(Context context) {
+    public CakeViewDemo(Context context) {
         this(context, null);
     }
 
-    public CakeView(Context context, AttributeSet attrs) {
+    public CakeViewDemo(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CakeView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CakeViewDemo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
@@ -85,6 +88,8 @@ public class CakeView extends View {
         this.textPaint.setDither(true);
         this.textPaint.setStyle(Paint.Style.FILL);
         this.textPaint.setColor(Color.parseColor("#FFFFFF"));
+
+
     }
 
     @Override
@@ -122,56 +127,85 @@ public class CakeView extends View {
         textPaint.setTextSize(radius / 7);
     }
 
+    private int mListSize = 0;
+    private float sweepAngle = 0f;
+
+    private List<float[]> saveLastAngle = new ArrayList<>();
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        textList.clear();
-        lineList.clear();
-        lineList = new ArrayList<>();
-        textList = new ArrayList<>();
+//        textList.clear();
+//        lineList.clear();
+//        lineList = new ArrayList<>();
+//        textList = new ArrayList<>();
 
         if (mList != null) {
             RectF mRectF = new RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
-            for (int i = 0; i < mList.size(); i++) {
-                arcPaint.setColor(mList.get(i).color);
-                canvas.drawArc(mRectF, startAngle, mList.get(i).percent / total * roundAngle, false, arcPaint);
+            for (int i = 0; i < mListSize + 1; i++) {
+                if (i < mListSize) {
+                    arcPaint.setColor(mList.get(i).color);
+                    canvas.drawArc(mRectF, saveLastAngle.get(i)[0], saveLastAngle.get(i)[1], false, arcPaint);
 
-                if (isAddText) {
-                    lineList.add(getLinePointFs(startAngle));//获取直线 开始坐标 结束坐标
-
-                    textAngle = startAngle + mList.get(i).percent / total * roundAngle / 2;
-                    textList.add(getTextPointF(textAngle));   //获取文本文本
+                } else {
+                    arcPaint.setColor(mList.get(mListSize).color);
+                    canvas.drawArc(mRectF, startAngle, sweepAngle, false, arcPaint);
                 }
 
-                startAngle += mList.get(i).percent / total * roundAngle;
-            }
-            //绘制间隔空白线
-            // drawSpacingLine(canvas, lineList);
-            //绘制文字
-            //drawText(canvas);
-        }
 
-        if (roundAngle < 360f) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    roundAngle += 10f;
-                    if (roundAngle == 360f - 10f) {
-                        isAddText = true;
+            }
+
+//                lineList.add(getLinePointFs());//获取直线 开始坐标 结束坐标
+//
+//                textAngle = startAngle + mList.get(i).percent / total * 360f / 2;
+//                textList.add(getTextPointF());   //获取文本文本
+
+        }
+        // 绘制间隔空白线
+        drawSpacingLine(canvas, lineList);
+        // 绘制文字
+        //   drawText(canvas);
+        //   }
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (sweepAngle < saveLastAngle.get(mListSize)[1]) {
+                    sweepAngle += 10f;
+                    if (sweepAngle >= saveLastAngle.get(mListSize)[1]) {
+                        sweepAngle = saveLastAngle.get(mListSize)[1];
                     }
                     postInvalidate();
-                }
-            }, 50);
-        } else {
-            // 绘制间隔空白线
-            drawSpacingLine(canvas, lineList);
-            // 绘制文字
-            drawText(canvas);
+                } else {
 
-            if (handler != null) {
-                handler.removeCallbacksAndMessages(null);
+                    if (mListSize < mList.size() - 1) {
+
+                        mListSize++;
+
+                        startAngle += sweepAngle;
+
+                        lineList.add(getLinePointFs());//获取直线 开始坐标 结束坐标
+
+                        //  textAngle = startAngle + mList.get(mListSize).percent / total * 360f / 2;
+                        //  textList.add(getTextPointF());   //获取文本文本
+
+                        float stopAngle = mList.get(mListSize).percent / total * 360f;
+
+                        float[] ft = new float[]{startAngle, stopAngle};
+
+                        saveLastAngle.add(ft);
+
+                        sweepAngle = 10f;
+
+                        postInvalidate();
+
+                    }
+
+                }
             }
-        }
+        }, 20);
+
+
     }
 
     /**
@@ -179,20 +213,20 @@ public class CakeView extends View {
      *
      * @return
      */
-    private PointF getTextPointF(float angle) {
-        float textPointX = (float) (centerX + radius * Math.cos(Math.toRadians(angle)));
-        float textPointY = (float) (centerY + radius * Math.sin(Math.toRadians(angle)));
+    private PointF getTextPointF() {
+        float textPointX = (float) (centerX + radius * Math.cos(Math.toRadians(textAngle)));
+        float textPointY = (float) (centerY + radius * Math.sin(Math.toRadians(textAngle)));
         return new PointF(textPointX, textPointY);
     }
 
     /**
      * 获取直线 开始坐标 结束坐标
      */
-    private PointF[] getLinePointFs(float angle) {
-        float stopX = (float) (centerX + (radius + arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(angle)));
-        float stopY = (float) (centerY + (radius + arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(angle)));
-        float startX = (float) (centerX + (radius - arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(angle)));
-        float startY = (float) (centerY + (radius - arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(angle)));
+    private PointF[] getLinePointFs() {
+        float stopX = (float) (centerX + (radius + arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(startAngle)));
+        float stopY = (float) (centerY + (radius + arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(startAngle)));
+        float startX = (float) (centerX + (radius - arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(startAngle)));
+        float startY = (float) (centerY + (radius - arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(startAngle)));
         PointF startPoint = new PointF(startX, startY);
         PointF stopPoint = new PointF(stopX, stopY);
         return new PointF[]{startPoint, stopPoint};
@@ -204,6 +238,17 @@ public class CakeView extends View {
      * @param canvas
      */
     private void drawSpacingLine(Canvas canvas, List<PointF[]> pointFs) {
+
+        if (startAngle == 0) {
+            float stopX = (float) (centerX + (radius + arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(startAngle)));
+            float stopY = (float) (centerY + (radius + arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(startAngle)));
+            float startX = (float) (centerX + (radius - arcPaint.getStrokeWidth() / 2) * Math.cos(Math.toRadians(startAngle)));
+            float startY = (float) (centerY + (radius - arcPaint.getStrokeWidth() / 2) * Math.sin(Math.toRadians(startAngle)));
+            PointF startPoint = new PointF(startX, startY);
+            PointF stopPoint = new PointF(stopX, stopY);
+            pointFs.add(new PointF[]{startPoint, stopPoint});
+        }
+
         for (PointF[] fp : pointFs) {
             canvas.drawLine(fp[0].x, fp[0].y, fp[1].x, fp[1].y, linePaint);
         }
@@ -274,6 +319,10 @@ public class CakeView extends View {
         for (int i = 0; i < mList.size(); i++) {
             total += mList.get(i).percent;
         }
+
+        float[] ft = new float[]{0, mList.get(0).percent / total * 360f};
+        saveLastAngle.add(ft);
+
         this.mList.clear();
         this.mList = mList;
         invalidate();
@@ -303,16 +352,24 @@ public class CakeView extends View {
         return new int[]{outMetrics.widthPixels, outMetrics.heightPixels};
     }
 
-    private static class MyHandler extends Handler {
-        private WeakReference<CakeView> activityWeakReference;
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+    }
 
-        public MyHandler(CakeView activity) {
-            activityWeakReference = new WeakReference<CakeView>(activity);
+    private static class MyHandler extends Handler {
+        private WeakReference<CakeViewDemo> activityWeakReference;
+
+        public MyHandler(CakeViewDemo activity) {
+            activityWeakReference = new WeakReference<CakeViewDemo>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            CakeView activity = activityWeakReference.get();
+            CakeViewDemo activity = activityWeakReference.get();
             if (activity == null) {
                 return;
             }

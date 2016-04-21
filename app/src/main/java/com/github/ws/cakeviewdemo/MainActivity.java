@@ -3,15 +3,17 @@ package com.github.ws.cakeviewdemo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseArray;
 
 import com.github.ws.cakeviewdemo.bean.BaseMessage;
 import com.github.ws.cakeviewdemo.widget.CakeView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private CakeView cv;
-    private SparseArray<BaseMessage> sparseArray;
+    private List<BaseMessage> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,48 +21,50 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         cv = (CakeView) findViewById(R.id.cv);
 
-        sparseArray = new SparseArray<>();
+       // cv.setStartAngle(60);
+
+        //cv.setSpacingLineColor(Color.parseColor("#000000"));
+
+        cv.setTextColor(Color.parseColor("#000000"));
+
+        mList = new ArrayList<>();
+
         BaseMessage mes = new BaseMessage();
-        mes.percent = 30;
-        mes.content = "远程控制";
+        mes.percent = 50;
+        mes.content = "身高";
         mes.color = Color.parseColor("#0ff000");
-        sparseArray.put(0, mes);
-        mes = new BaseMessage();
-        mes.percent = 50;
-        mes.content = "流氓推送";
-        mes.color = Color.parseColor("#ff00ff");
-        sparseArray.put(1, mes);
-        mes = new BaseMessage();
-        mes.percent = 30;
-        mes.content = "广告推送";
-        mes.color = Color.parseColor("#fff000");
-        sparseArray.put(2, mes);
+        mList.add(mes);
 
-        mes = new BaseMessage();
-        mes.percent = 40;
-        mes.content = "广告推送";
-        mes.color = Color.parseColor("#ffff99");
-        sparseArray.put(3, mes);
+        BaseMessage message = new BaseMessage();
+        message.percent = 20;
+        message.content = "体重";
+        message.color = Color.parseColor("#fff000");
+        mList.add(message);
 
-        mes = new BaseMessage();
-        mes.percent = 20;
-        mes.content = "广告推送";
-        mes.color = Color.parseColor("#993399");
-        sparseArray.put(4, mes);
+        BaseMessage mes0 = new BaseMessage();
+        mes0.percent = 30;
+        mes0.content = "言谈举止";
+        mes0.color = Color.parseColor("#ff00ff");
+        mList.add(mes0);
 
-        mes = new BaseMessage();
-        mes.percent = 50;
-        mes.content = "广告推送";
-        mes.color = Color.parseColor("#ffff66");
-        sparseArray.put(5, mes);
+        BaseMessage mes1 = new BaseMessage();
+        mes1.percent = 40;
+        mes1.content = "打扮穿着";
+        mes1.color = Color.parseColor("#00ffff");
+        mList.add(mes1);
 
-        mes.percent = 30;
-        mes.content = "广告推送";
-        mes.color = Color.parseColor("#0099ff");
-        sparseArray.put(6, mes);
+        BaseMessage mes2 = new BaseMessage();
+        mes2.percent = 30;
+        mes2.content = "家庭背景";
+        mes2.color = Color.parseColor("#0099ff");
+        mList.add(mes2);
 
+        BaseMessage mes3 = new BaseMessage();
+        mes3.percent = 40;
+        mes3.content = "学历";
+        mes3.color = Color.parseColor("#ff0000");
+        mList.add(mes3);
 
-
-        cv.setCakeData(sparseArray);
+        cv.setCakeData(mList);
     }
 }
