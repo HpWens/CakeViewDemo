@@ -67,8 +67,6 @@
  int height=fm.descent - fm.ascent;
   canvas.drawText(format.format(mList.get(i).percent * 100 / total) + "%", textList.get(i).x, textList.get(i).y + height, textPaint);
 ```
-到这里大体上就完成了饼图的制作，是不是很容易。感兴趣的同学可以自行烤到自己项目中，动一动你的手指5分钟集成饼图：
-
-有什么宝贵的意见请给我留言。
+到这里大体上就完成了饼图的制作，是不是很容易。感兴趣的同学可以自行烤到自己项目中，动一动你的手指5分钟集成饼图。有什么宝贵的意见请给我留言。
 
 
