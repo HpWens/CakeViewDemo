@@ -4,6 +4,8 @@
 
 ![cake](http://img.blog.csdn.net/20160420234348449)
 
+![cake](https://github.com/HpWens/CakeViewDemo/blob/master/app/src/assets/a.gif)
+
 我们一起来看看设计流程：
 
 ##onDraw
